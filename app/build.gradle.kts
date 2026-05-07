@@ -10,7 +10,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.lurkki14.miuntesti"
+        applicationId = "com.lurkki14.repotuli"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
