@@ -1,5 +1,6 @@
 package com.lurkki14.repotuli
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +19,13 @@ class StationAdapter() : RecyclerView.Adapter<StationAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.textView.text = stations[position].name
+        val station = stations[position]
+        // TODO: localize station name
+        holder.textView.text = station.name
+        holder.itemView.setOnClickListener {
+            val intent = Intent(it.context, StationActivity::class.java)
+            intent.putExtra("station", station)
+            it.context.startActivity(intent)
         }
     }
 
