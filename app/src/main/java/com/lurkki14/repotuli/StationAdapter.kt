@@ -18,10 +18,24 @@ class StationAdapter() : RecyclerView.Adapter<StationAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.textView.text = stations[position]
+        holder.textView.text = stations[position].name
+        }
     }
 
     override fun getItemCount() = stations.size
 
-    private val stations = listOf("Station 1", "Station 2", "Station 3");
+    private val stations = listOf(
+        Station("KEV", "Kevo", 55, 165),
+        Station("KIL", "Kilpisjärvi", 61, 210),
+        Station("IVA", "Ivalo", 72, 275),
+        Station("MUO", "Muonio", 75, 300),
+        Station("SOD", "Sodankylä", 74, 290),
+        Station("PEL", "Pello", 73, 285),
+        Station("RAN", "Ranua", 70, 240),
+        Station("OUJ", "Oulujärvi", 68, 200),
+        Station("MEK", "Mekrijärvi", 64, 150),
+        Station("HAN", "Hankasalmi", 63, 140),
+        Station("NUR", "Nurmijärvi", 60, 120),
+        Station("TAR", "Tartto", 55, 100)
+    )
 }
