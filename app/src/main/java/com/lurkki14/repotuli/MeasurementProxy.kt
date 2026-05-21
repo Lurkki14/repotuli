@@ -10,9 +10,11 @@ import java.net.URL
 
 
 typealias StationCode = String
+
 class MeasurementProxy {
 
-    private val DATA_URL ="https://cdn.fmi.fi/apps/magnetic-disturbance-observation-graphs/serve-data.php"
+    private val DATA_URL =
+        "https://cdn.fmi.fi/apps/magnetic-disturbance-observation-graphs/serve-data.php"
     private val CLASS_NAME = "MeasurementProxy"
     private val TIMESTAMP_IDX = 0
     private val VALUE_IDX = 1
