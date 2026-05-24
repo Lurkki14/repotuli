@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
-import java.lang.invoke.MethodHandles
 import java.net.URL
 
 
@@ -31,7 +30,6 @@ class MeasurementProxy {
             val stationMeasurements = mutableListOf<StationMeasurement>()
 
             // Don't spam errors in parsing loop
-            var errMsg: String? = null
             var exception: JSONException? = null
             for (i in 0 until dataSeries.length()) {
                 try {
