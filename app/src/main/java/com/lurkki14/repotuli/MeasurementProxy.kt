@@ -6,11 +6,14 @@ import kotlinx.coroutines.withContext
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.URL
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
+import java.util.TimeZone
 
 
 typealias StationCode = String
 
-class MeasurementProxy {
+object MeasurementProxy {
 
     private val DATA_URL =
         "https://cdn.fmi.fi/apps/magnetic-disturbance-observation-graphs/serve-data.php"
@@ -51,16 +54,13 @@ class MeasurementProxy {
     }
 
     suspend fun updateMeasurements() = withContext(Dispatchers.IO) {
-        /* TODO: only run at start, and when we expect new measurements to be available
-        (every 5 mins) */
-
         try {
             val jsonString = URL(DATA_URL).readText(Charsets.UTF_8)
             val newMeasurements = fromJSONString(jsonString)
 
-            synchronized(measurements) {
-                measurements.clear()
-                measurements.putAll(newMeasurements)
+            synchronized(allMeasurements) {
+                allMeasurements.clear()
+                allMeasurements.putAll(newMeasurements)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -68,12 +68,31 @@ class MeasurementProxy {
     }
 
     suspend fun getMeasurementsForStation(code: String): List<StationMeasurement>? {
-        updateMeasurements()
+        // Since the timestamps are Unix timestamps, but converted into Finnish timezone (WTF?)
+        // calculate time elapsed relative to Finnish timezone
+        // Epoch s -> epoch ms
+        val nowUTC = OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() * 1000
+        val fiOffset = TimeZone.getTimeZone("Europe/Helsinki").getOffset(nowUTC)
 
-        return synchronized(measurements) {
-            measurements[code]
+        val fiNow = nowUTC + fiOffset
+
+        // If we are more than 5 minutes ahead of latest measurement, run the update
+        val interval = 300000UL
+        if (fiNow.toULong() > (latestMeasurementTS + interval)) {
+            updateMeasurements()
+
+            allMeasurements.forEach { _, measurements ->
+                val latest = measurements.lastOrNull()
+                latest?.unixTS?.let {
+                    if (it > latestMeasurementTS)
+                        latestMeasurementTS = it
+                }
+            }
         }
+
+        return allMeasurements[code]
     }
 
-    private val measurements = mutableMapOf<StationCode, List<StationMeasurement>>()
+    private val allMeasurements = mutableMapOf<StationCode, List<StationMeasurement>>()
+    private var latestMeasurementTS = 0UL
 }

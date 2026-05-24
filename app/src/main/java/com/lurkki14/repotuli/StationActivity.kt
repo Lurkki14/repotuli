@@ -10,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 
 class StationActivity : AppCompatActivity() {
-    private val measurementProxy = MeasurementProxy()
+    private val measurementProxy = MeasurementProxy
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
