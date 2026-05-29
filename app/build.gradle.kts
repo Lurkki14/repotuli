@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.mapsforge.map.android)
     implementation(libs.mapsforge.map)
     implementation(libs.mapsforge.themes)

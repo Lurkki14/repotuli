@@ -12,6 +12,7 @@ constraintlayout = "2.1.4"
 legacySupportV4 = "1.0.0"
 recyclerview = "1.3.0"
 mapsforge = "0.25.0"
+lifecycleRuntimeKtx = "2.6.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -27,6 +28,7 @@ androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview"
 mapsforge-map-android = { group = "org.mapsforge", name = "mapsforge-map-android", version.ref = "mapsforge" }
 mapsforge-map = { group = "org.mapsforge", name = "mapsforge-map", version.ref = "mapsforge" }
 mapsforge-themes = { group = "org.mapsforge", name = "mapsforge-themes", version.ref = "mapsforge" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

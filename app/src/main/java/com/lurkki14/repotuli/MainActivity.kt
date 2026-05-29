@@ -60,6 +60,9 @@ class MainActivity : AppCompatActivity() {
         mapView.model.mapViewPosition.center = LatLong(60.1699, 24.9384) // Helsinki
 
         mapView.layerManager.layers.add(StationLayer(this))
+
+        // Notify about ON_RESUME
+        lifecycle.addObserver(MeasurementProxy)
     }
 
     // Map seems to seize downloading layers without these
