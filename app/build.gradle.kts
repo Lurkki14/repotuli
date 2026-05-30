@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,9 +8,7 @@ plugins {
 
 android {
     namespace = "com.lurkki14.repotuli"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.lurkki14.repotuli"
@@ -33,8 +34,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
         isCoreLibraryDesugaringEnabled = true
     }
-    kotlinOptions {
-        jvmTarget = "11"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+            languageVersion.set(KotlinVersion.KOTLIN_1_9)
+        }
     }
     buildFeatures {
         viewBinding = true
@@ -56,5 +60,6 @@ dependencies {
     implementation(libs.mapsforge.map.android)
     implementation(libs.mapsforge.map)
     implementation(libs.mapsforge.themes)
+    implementation(libs.vico.views)
     testImplementation(libs.junit)
 }

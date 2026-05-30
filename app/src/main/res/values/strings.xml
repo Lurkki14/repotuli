@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">Repotuli</string>
-    <string name="latest_measurement">Viimeisin lukema: %.2f"</string>
-    <string name="latest_measurement_error">Viimeisintä lukemaa ei pystytty hakemaan</string>
+    <string name="measurement_chart_y_axis_legend">Arvo</string>
 </resources>
