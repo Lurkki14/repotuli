@@ -19,6 +19,8 @@ import org.mapsforge.map.android.graphics.AndroidGraphicFactory
 import org.mapsforge.map.layer.Layer
 import org.mapsforge.map.view.MapView
 
+typealias StationCode = String
+
 class StationLayer(private val context: Context, parent: AppCompatActivity, mapView: MapView) :
     Layer() {
     init {
