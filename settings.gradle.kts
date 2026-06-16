@@ -20,4 +20,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Repotuli"
-include(":app")
+include(":repotuli")
