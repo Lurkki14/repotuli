@@ -18,6 +18,7 @@ import org.mapsforge.core.util.MercatorProjection
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory
 import org.mapsforge.map.layer.Layer
 import org.mapsforge.map.view.MapView
+import androidx.core.graphics.toColorInt
 
 typealias StationCode = String
 
@@ -70,8 +71,12 @@ class StationLayer(private val context: Context, parent: AppCompatActivity, mapV
             setTypeface(FontFamily.DEFAULT, FontStyle.BOLD)
             strokeWidth = 5f
         }
-        val paintFill: Paint = AGF.createPaint().apply {
-            color = Color.RED
+        val paintLowFill: Paint = AGF.createPaint().apply {
+            color = "#36ffff".toColorInt()
+            setStyle(Style.FILL)
+        }
+        val paintMissingFill = AGF.createPaint().apply {
+            color = Color.BLACK
             setStyle(Style.FILL)
         }
 
@@ -89,11 +94,40 @@ class StationLayer(private val context: Context, parent: AppCompatActivity, mapV
                     tileSize
                 ) - topLeftPoint.y
 
-                canvas.drawCircle(x.toInt(), y.toInt(), 25, paintFill)
-                canvas.drawCircle(x.toInt(), y.toInt(), 25, paintStroke)
+                val latestMeasurement = allMeasurements[station.code]?.lastOrNull()?.value
+
+                // Draw indicator according to aurora activity
+                if (latestMeasurement != null) {
+                    val intensity = fromStationMeasurement(station, latestMeasurement)
+                    when (intensity) {
+                        AuroraIntensity.Low -> {
+                            canvas.drawCircle(x.toInt(), y.toInt(), 25, paintLowFill)
+                            canvas.drawCircle(x.toInt(), y.toInt(), 25, paintStroke)
+                        }
+
+                        AuroraIntensity.Medium -> {
+                            auroraLowBmp?.let {
+                                // Otherwise draws off-center
+                                val halfWidth = it.width / 2
+                                val halfHeight = it.height / 2
+                                canvas.drawBitmap(it, x.toInt() - halfWidth, y.toInt() - halfHeight)
+                            }
+                        }
+
+                        AuroraIntensity.High -> {
+                            auroraHighBmp?.let {
+                                val halfWidth = it.width / 2
+                                val halfHeight = it.height / 2
+                                canvas.drawBitmap(it, x.toInt() - halfWidth, y.toInt() - halfHeight)
+                            }
+                        }
+                    }
+                } else {
+                    canvas.drawCircle(x.toInt(), y.toInt(), 25, paintMissingFill)
+                }
 
                 var measurementString = ""
-                allMeasurements[station.code]?.lastOrNull()?.value?.let {
+                latestMeasurement?.let {
                     measurementString = "%.2f".format(it)
                 }
                 // Draw white outline first
@@ -131,5 +165,51 @@ class StationLayer(private val context: Context, parent: AppCompatActivity, mapV
         return false // Propagate event
     }
 
+    enum class AuroraIntensity {
+        Low,
+        Medium,
+        High
+    }
+
+    fun fromStationMeasurement(station: Station, measurement: Double): AuroraIntensity {
+        if (measurement >= station.highThreshold)
+            return AuroraIntensity.High
+        if (measurement >= station.lowThreshold)
+            return AuroraIntensity.Medium
+        return AuroraIntensity.Low
+    }
+
+    // Just for showing the 2 different aurora PNGs
+    fun layerBmpFromResource(resId: Int, targetHeight: Int): Bitmap? {
+        try {
+            val inputStream = context.resources.openRawResource(resId)
+            val AGF = AndroidGraphicFactory.INSTANCE
+            val bitmap = AGF.createResourceBitmap(
+                inputStream,
+                1.0f,
+                0,
+                0,
+                100,
+                resId.hashCode()
+            )
+            val aspectRatio = bitmap.width.toDouble() / bitmap.height.toDouble()
+            val targetWidth = (targetHeight * aspectRatio).toInt()
+
+            bitmap.scaleTo(targetWidth, targetHeight)
+            return bitmap
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return null
+    }
+
     private var allMeasurements = mapOf<StationCode, List<StationMeasurement>>()
+
+    private val auroraLowBmp: Bitmap? by lazy {
+        layerBmpFromResource(R.raw.revontuli, 60)
+    }
+
+    private val auroraHighBmp: Bitmap? by lazy {
+        layerBmpFromResource(R.raw.revontuli_puna, 60)
+    }
 }
