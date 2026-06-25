@@ -120,17 +120,18 @@ class StationActivity : AppCompatActivity() {
                     measurementProxy.allMeasurementsFlow.collect { allMeasurements ->
                         val measurements = allMeasurements[station.code] ?: emptyList()
 
-                        // Show the last N measurements in the bar chart
-                        val lastN = measurements.takeLast(200)
+                        // FMI API gives last 300 measurements
+                        val lastN = measurements.takeLast(300)
 
-                        modelProducer.runTransaction {
-                            columnModel {
-                                series(
-                                    x = lastN.map { it.unixTS.toLong() },
-                                    y = lastN.map { it.value }
-                                )
+                        if (!lastN.isEmpty())
+                            modelProducer.runTransaction {
+                                columnModel {
+                                    series(
+                                        x = lastN.map { it.unixTS.toLong() },
+                                        y = lastN.map { it.value }
+                                    )
+                                }
                             }
-                        }
                     }
                 }
             }
