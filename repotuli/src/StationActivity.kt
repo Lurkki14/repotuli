@@ -117,7 +117,7 @@ class StationActivity : AppCompatActivity() {
         if (station != null) {
             lifecycleScope.launch {
                 repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    measurementProxy.allMeasurementsFlow.collect { allMeasurements ->
+                    MeasurementCollector.allMeasurementsFlow.collect { allMeasurements ->
                         val measurements = allMeasurements[station.code] ?: emptyList()
 
                         // FMI API gives last 300 measurements

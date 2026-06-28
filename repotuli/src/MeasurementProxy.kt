@@ -38,12 +38,14 @@ object MeasurementProxy : LifecycleEventObserver {
         }
     }
 
-    suspend fun updateLoop() {
+    fun fiNow(): Long {
         val nowUTC = OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() * 1000
         val fiOffset = TimeZone.getTimeZone("Europe/Helsinki").getOffset(nowUTC)
-        val fiNow = nowUTC + fiOffset
-        val nextExpectedTS = latestMeasurementTS + (300_000UL + 10_000UL)
-        val delta = nextExpectedTS.toLong() - fiNow
+        return nowUTC + fiOffset
+    }
+
+    suspend fun updateLoop() {
+        val delta = MeasurementCollector.nextExpectedTS.toLong() - fiNow()
         val delayMs = maxOf(delta, 0)
         delay(delayMs)
         updateMeasurements()
@@ -88,30 +90,22 @@ object MeasurementProxy : LifecycleEventObserver {
     }
 
     suspend fun updateMeasurements() = withContext(Dispatchers.IO) {
-        try {
-            val jsonString = URL(DATA_URL).readText(Charsets.UTF_8)
-            val newMeasurements = fromJSONString(jsonString)
+        // Check if something else is updating measurements
+        if (fiNow().toULong() > MeasurementCollector.nextExpectedTS &&
+                !MeasurementCollector.updateLock.isLocked)
+            try {
+                val jsonString = URL(DATA_URL).readText(Charsets.UTF_8)
+                val newMeasurements = fromJSONString(jsonString)
 
-            allMeasurementsMut.value = newMeasurements
-            allMeasurementsMut.value.forEach { (_, measurements) ->
-                val latest = measurements.lastOrNull()
-                latest?.unixTS?.let {
-                    if (it > latestMeasurementTS)
-                        latestMeasurementTS = it
-                }
+                MeasurementCollector.pushNew(newMeasurements)
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
-    fun getMeasurementsForStation(code: String): List<StationMeasurement>? {
-        return allMeasurementsMut.value[code]
-    }
-
-    private val allMeasurementsMut =
+    /*private val allMeasurementsMut =
         MutableStateFlow<Map<String, List<StationMeasurement>>>(emptyMap())
 
     val allMeasurementsFlow = allMeasurementsMut.asStateFlow()
-    private var latestMeasurementTS = 0UL
+    private var latestMeasurementTS = 0UL*/
 }
