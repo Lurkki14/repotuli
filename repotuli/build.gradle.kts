@@ -1,9 +1,11 @@
+import com.google.protobuf.gradle.proto
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -49,6 +51,9 @@ android {
             manifest.srcFile("AndroidManifest.xml")
             java.srcDirs("src")
             res.srcDirs("res")
+            proto {
+                srcDirs("src/proto")
+            }
         }
     }
 }
@@ -65,9 +70,27 @@ dependencies {
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.mapsforge.map.android)
     implementation(libs.mapsforge.map)
     implementation(libs.mapsforge.themes)
     implementation(libs.vico.views)
+    implementation(libs.androidx.datastore)
+    implementation(libs.protobuf.javalite)
     testImplementation(libs.junit)
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:${libs.versions.protobuf.get()}"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }

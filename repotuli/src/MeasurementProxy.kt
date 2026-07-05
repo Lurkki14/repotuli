@@ -21,7 +21,7 @@ import java.time.ZoneOffset
 import java.util.TimeZone
 
 object MeasurementProxy : LifecycleEventObserver {
-    private val DATA_URL =
+    val DATA_URL =
         "https://cdn.fmi.fi/apps/magnetic-disturbance-observation-graphs/serve-data.php"
     private val CLASS_NAME = "MeasurementProxy"
     private val TIMESTAMP_IDX = 0
@@ -98,14 +98,12 @@ object MeasurementProxy : LifecycleEventObserver {
                 val newMeasurements = fromJSONString(jsonString)
 
                 MeasurementCollector.pushNew(newMeasurements)
+            } catch (_: java.net.UnknownHostException) {
+                Log.e(CLASS_NAME, "Unable to resolve host \"cdn.fmi.fi\"")
+            } catch (e: java.io.IOException) {
+                Log.e(CLASS_NAME, "Network error while fetching measurements", e)
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(CLASS_NAME, "Unexpected error in updateMeasurements", e)
             }
     }
-
-    /*private val allMeasurementsMut =
-        MutableStateFlow<Map<String, List<StationMeasurement>>>(emptyMap())
-
-    val allMeasurementsFlow = allMeasurementsMut.asStateFlow()
-    private var latestMeasurementTS = 0UL*/
 }
