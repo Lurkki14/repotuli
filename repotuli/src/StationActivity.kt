@@ -14,7 +14,6 @@ import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.ToggleButton
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -26,6 +25,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.lurkki14.repotuli.NotificationHandler.notificationSettingsStore
 import com.patrykandpatrick.vico.views.cartesian.*
 import com.patrykandpatrick.vico.views.cartesian.Scroll
@@ -61,7 +61,7 @@ class StationActivity : AppCompatActivity() {
     private var station: Station? = null
     private var selectedLevel = AlertLevel.High
     private lateinit var customThresholdInput: EditText
-    private lateinit var stationNotifyToggle: ToggleButton
+    private lateinit var stationNotifyToggle: MaterialSwitch
 
     fun fromFiUnixTS(ts: ULong, tz: ZoneId): ZonedDateTime {
         val fiOffset = TimeZone.getTimeZone("Europe/Helsinki").getOffset(ts.toLong())

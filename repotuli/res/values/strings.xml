@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">Repotuli</string>
     <string name="measurement_chart_y_axis_legend">Arvo</string>
-    <string name="notify_on">Ilmoitukset päällä</string>
-    <string name="notify_off">Ilmoitukset pois päältä</string>
+    <string name="notify_toggle_label">Ilmoitukset</string>
     <string name="channel_name">Asemavalvonta</string>
     <string name="channel_description">Ilmoitukset valituilta asemilta</string>
     <string name="notification_title">Asema %s</string>
