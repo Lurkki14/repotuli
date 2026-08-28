@@ -21,7 +21,7 @@ import java.time.ZoneOffset
 import java.util.TimeZone
 
 object MeasurementProxy : LifecycleEventObserver {
-    private val DATA_URL =
+    val DATA_URL =
         "https://cdn.fmi.fi/apps/magnetic-disturbance-observation-graphs/serve-data.php"
     private val CLASS_NAME = "MeasurementProxy"
     private val TIMESTAMP_IDX = 0
@@ -38,12 +38,14 @@ object MeasurementProxy : LifecycleEventObserver {
         }
     }
 
-    suspend fun updateLoop() {
+    fun fiNow(): Long {
         val nowUTC = OffsetDateTime.now(ZoneOffset.UTC).toEpochSecond() * 1000
         val fiOffset = TimeZone.getTimeZone("Europe/Helsinki").getOffset(nowUTC)
-        val fiNow = nowUTC + fiOffset
-        val nextExpectedTS = latestMeasurementTS + (300_000UL + 10_000UL)
-        val delta = nextExpectedTS.toLong() - fiNow
+        return nowUTC + fiOffset
+    }
+
+    suspend fun updateLoop() {
+        val delta = MeasurementCollector.nextExpectedTS.toLong() - fiNow()
         val delayMs = maxOf(delta, 0)
         delay(delayMs)
         updateMeasurements()
@@ -88,30 +90,20 @@ object MeasurementProxy : LifecycleEventObserver {
     }
 
     suspend fun updateMeasurements() = withContext(Dispatchers.IO) {
-        try {
-            val jsonString = URL(DATA_URL).readText(Charsets.UTF_8)
-            val newMeasurements = fromJSONString(jsonString)
+        // Check if something else is updating measurements
+        if (fiNow().toULong() > MeasurementCollector.nextExpectedTS &&
+                !MeasurementCollector.updateLock.isLocked)
+            try {
+                val jsonString = URL(DATA_URL).readText(Charsets.UTF_8)
+                val newMeasurements = fromJSONString(jsonString)
 
-            allMeasurementsMut.value = newMeasurements
-            allMeasurementsMut.value.forEach { (_, measurements) ->
-                val latest = measurements.lastOrNull()
-                latest?.unixTS?.let {
-                    if (it > latestMeasurementTS)
-                        latestMeasurementTS = it
-                }
+                MeasurementCollector.pushNew(newMeasurements)
+            } catch (_: java.net.UnknownHostException) {
+                Log.e(CLASS_NAME, "Unable to resolve host \"cdn.fmi.fi\"")
+            } catch (e: java.io.IOException) {
+                Log.e(CLASS_NAME, "Network error while fetching measurements", e)
+            } catch (e: Exception) {
+                Log.e(CLASS_NAME, "Unexpected error in updateMeasurements", e)
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
-
-    fun getMeasurementsForStation(code: String): List<StationMeasurement>? {
-        return allMeasurementsMut.value[code]
-    }
-
-    private val allMeasurementsMut =
-        MutableStateFlow<Map<String, List<StationMeasurement>>>(emptyMap())
-
-    val allMeasurementsFlow = allMeasurementsMut.asStateFlow()
-    private var latestMeasurementTS = 0UL
 }

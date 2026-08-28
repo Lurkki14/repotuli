@@ -28,7 +28,7 @@ class StationLayer(private val context: Context, parent: AppCompatActivity, mapV
         // Follow activity's lifecycle
         parent.lifecycleScope.launch {
             parent.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                MeasurementProxy.allMeasurementsFlow.collect { allMeasurements_ ->
+                MeasurementCollector.allMeasurementsFlow.collect { allMeasurements_ ->
                     allMeasurements = allMeasurements_
                     // Repaint in case map isn't moved
                     mapView.repaint()
