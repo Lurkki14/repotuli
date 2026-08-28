@@ -14,6 +14,7 @@ import android.widget.AutoCompleteTextView
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -60,6 +61,7 @@ class StationActivity : AppCompatActivity() {
     private val measurementProxy = MeasurementProxy
     private var station: Station? = null
     private var selectedLevel = AlertLevel.High
+    private var lastSavedSetting: StationSetting? = null
     private lateinit var customThresholdInput: EditText
     private lateinit var stationNotifyToggle: MaterialSwitch
 
@@ -141,7 +143,11 @@ class StationActivity : AppCompatActivity() {
                 .setCode(station.code)
                 .setThreshold(threshold)
                 .build()
-            NotificationHandler.addStation(this, setting)
+            if (setting != lastSavedSetting) {
+                NotificationHandler.addStation(this, setting)
+                lastSavedSetting = setting
+                Toast.makeText(this, R.string.station_settings_saved, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -204,6 +210,7 @@ class StationActivity : AppCompatActivity() {
                         else -> AlertLevel.Custom
                     }
 
+                    lastSavedSetting = setting
                     stationNotifyToggle.isChecked = true
                     alertSettingsContainer.visibility = View.VISIBLE
                     alertLevelDropdown.setText(options[selectedLevel.ordinal], false)

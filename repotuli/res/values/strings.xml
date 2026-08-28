@@ -16,4 +16,5 @@
     <string name="permission_dialog_message">Sovellus tarvitsee ilmoitusoikeudet voidakseen hälyttää revontulista. Haluatko siirtyä asetuksiin myöntämään oikeudet?</string>
     <string name="permission_dialog_settings">Asetuksiin</string>
     <string name="permission_dialog_cancel">Peruuta</string>
+    <string name="station_settings_saved">Aseman asetukset tallennettu</string>
 </resources>
