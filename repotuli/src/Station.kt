@@ -16,6 +16,20 @@ data class Station(
     val coordinates: Coordinates
 ) : Serializable {
 
+    enum class AuroraIntensity {
+        Low,
+        Medium,
+        High
+    }
+
+    fun fromStationMeasurement(measurement: Double): AuroraIntensity {
+        if (measurement >= highThreshold)
+            return AuroraIntensity.High
+        if (measurement >= lowThreshold)
+            return AuroraIntensity.Medium
+        return AuroraIntensity.Low
+    }
+
     companion object {
         val AllStations = listOf(
             Station("KEV", "Kevo", 55.0, 165.0, Coordinates(69.76, 27.01)),

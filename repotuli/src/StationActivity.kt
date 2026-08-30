@@ -3,7 +3,6 @@ package com.lurkki14.repotuli
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -38,6 +37,8 @@ import com.patrykandpatrick.vico.views.cartesian.data.columnModel
 import com.patrykandpatrick.vico.views.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.views.cartesian.marker.ColumnCartesianLayerMarkerTarget
 import com.patrykandpatrick.vico.views.cartesian.marker.DefaultCartesianMarker
+import com.patrykandpatrick.vico.views.cartesian.data.ColumnCartesianLayerModel
+import com.patrykandpatrick.vico.views.common.data.ExtraStore
 import com.patrykandpatrick.vico.views.common.Fill
 import com.patrykandpatrick.vico.views.common.Insets
 import com.patrykandpatrick.vico.views.common.component.LineComponent
@@ -259,14 +260,31 @@ class StationActivity : AppCompatActivity() {
             autoScrollCondition = AutoScrollCondition.OnModelGrowth
         )
         val textColor = MaterialColors.getColor(chartView, android.R.attr.textColorPrimary)
+        val lowLine = LineComponent(fill = Fill(Consts.COLOR_AURORA_LOW.toInt()), thicknessDp = 8f)
+        val midLine = LineComponent(fill = Fill(Consts.COLOR_AURORA_MID.toInt()), thicknessDp = 8f)
+        val highLine =
+            LineComponent(fill = Fill(Consts.COLOR_AURORA_HIGH.toInt()), thicknessDp = 8f)
+
         chartView.chart = CartesianChart(
             ColumnCartesianLayer(
-                columnProvider = ColumnCartesianLayer.ColumnProvider.series(
-                    LineComponent(
-                        fill = Fill(Color.RED),
-                        thicknessDp = 8f
-                    )
-                ),
+                columnProvider = object : ColumnCartesianLayer.ColumnProvider {
+                    override fun getColumn(
+                        entry: ColumnCartesianLayerModel.Entry,
+                        extraStore: ExtraStore
+                    ): LineComponent {
+                        return when (station?.fromStationMeasurement(entry.y)) {
+                            Station.AuroraIntensity.Medium -> midLine
+                            Station.AuroraIntensity.High -> highLine
+                            else -> lowLine
+                        }
+                    }
+
+                    override fun getWidestSeriesColumn(
+                        seriesKey: Any,
+                        seriesIndex: Int,
+                        extraStore: ExtraStore
+                    ): LineComponent = lowLine
+                },
                 columnCollectionSpacingDp = 0f
             ),
             marker = DefaultCartesianMarker(

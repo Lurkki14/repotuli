@@ -18,7 +18,6 @@ import org.mapsforge.core.util.MercatorProjection
 import org.mapsforge.map.android.graphics.AndroidGraphicFactory
 import org.mapsforge.map.layer.Layer
 import org.mapsforge.map.view.MapView
-import androidx.core.graphics.toColorInt
 
 typealias StationCode = String
 
@@ -72,7 +71,7 @@ class StationLayer(private val context: Context, parent: AppCompatActivity, mapV
             strokeWidth = 5f
         }
         val paintLowFill: Paint = AGF.createPaint().apply {
-            color = "#36ffff".toColorInt()
+            color = Consts.COLOR_AURORA_LOW.toInt()
             setStyle(Style.FILL)
         }
         val paintMissingFill = AGF.createPaint().apply {
