@@ -38,9 +38,11 @@ import com.patrykandpatrick.vico.views.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.views.cartesian.marker.ColumnCartesianLayerMarkerTarget
 import com.patrykandpatrick.vico.views.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.views.cartesian.data.ColumnCartesianLayerModel
+import com.patrykandpatrick.vico.views.cartesian.decoration.HorizontalLine
 import com.patrykandpatrick.vico.views.common.data.ExtraStore
 import com.patrykandpatrick.vico.views.common.Fill
 import com.patrykandpatrick.vico.views.common.Insets
+import com.patrykandpatrick.vico.views.common.Position
 import com.patrykandpatrick.vico.views.common.component.LineComponent
 import com.patrykandpatrick.vico.views.common.component.TextComponent
 import java.time.Instant
@@ -264,6 +266,10 @@ class StationActivity : AppCompatActivity() {
         val midLine = LineComponent(fill = Fill(Consts.COLOR_AURORA_MID.toInt()), thicknessDp = 8f)
         val highLine =
             LineComponent(fill = Fill(Consts.COLOR_AURORA_HIGH.toInt()), thicknessDp = 8f)
+        val thresholdLowLine =
+            LineComponent(fill = Fill(Consts.COLOR_AURORA_MID.toInt()), thicknessDp = 2f)
+        val thresholdHighLine =
+            LineComponent(fill = Fill(Consts.COLOR_AURORA_HIGH.toInt()), thicknessDp = 2f)
 
         chartView.chart = CartesianChart(
             ColumnCartesianLayer(
@@ -321,6 +327,30 @@ class StationActivity : AppCompatActivity() {
                     textSizeSp = 10f,
                     truncateAt = null
                 ),
+            ),
+            decorations = listOf(
+                HorizontalLine(
+                    y = { station?.lowThreshold ?: 0.0 },
+                    line = thresholdLowLine,
+                    labelComponent = TextComponent(
+                        color = textColor,
+                        textSizeSp = 10f,
+                        margins = Insets(horizontalDp = 4f)
+                    ),
+                    label = { getString(R.string.alert_level_medium, station?.lowThreshold) },
+                    horizontalLabelPosition = Position.Horizontal.End
+                ),
+                HorizontalLine(
+                    y = { station?.highThreshold ?: 0.0 },
+                    line = thresholdHighLine,
+                    labelComponent = TextComponent(
+                        color = textColor,
+                        textSizeSp = 10f,
+                        margins = Insets(horizontalDp = 4f)
+                    ),
+                    label = { getString(R.string.alert_level_high, station?.highThreshold) },
+                    horizontalLabelPosition = Position.Horizontal.End
+                )
             )
         )
         val modelProducer = CartesianChartModelProducer()
