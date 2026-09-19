@@ -37,7 +37,7 @@ object NotificationHandler {
                 settings.stationsList.forEach { setting ->
                     val latestMeasurement = allMeasurements[setting.code]?.lastOrNull()
                     if (latestMeasurement != null && latestMeasurement.value >= setting.threshold) {
-                        sendTestNotification(ctx, setting.code)
+                        sendAuroraNotification(ctx, setting.code)
                     }
                 }
             }
@@ -61,7 +61,6 @@ object NotificationHandler {
             }
             builder.build()
         }
-        //sendTestNotification(context, setting.code)
     }
 
     suspend fun removeStation(context: Context, setting: Station) {
@@ -90,13 +89,13 @@ object NotificationHandler {
         Log.d(CLASS_NAME, "Notification channel created/updated")
     }
 
-    private fun sendTestNotification(context: Context, code: StationCode) {
+    private fun sendAuroraNotification(context: Context, code: StationCode) {
 
-        Log.d(CLASS_NAME, "Sending test notification for $code")
+        Log.d(CLASS_NAME, "Sending aurora notification for $code")
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle(context.getString(R.string.notification_title, code))
-            .setContentText(context.getString(R.string.notification_text))
+            .setSmallIcon(context.applicationInfo.icon)
+            .setContentTitle(context.getString(R.string.aurora_notification_title, code))
+            .setContentText(context.getString(R.string.aurora_notification_text))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
 

@@ -4,8 +4,8 @@
     <string name="notify_toggle_label">Ilmoitukset</string>
     <string name="channel_name">Asemavalvonta</string>
     <string name="channel_description">Ilmoitukset valituilta asemilta</string>
-    <string name="notification_title">Asema %s</string>
-    <string name="notification_text">Valvonta aktivoitu tälle asemalle.</string>
+    <string name="aurora_notification_title">Asema %s</string>
+    <string name="aurora_notification_text">Aseman viimeisin arvo on ylittänyt asetetun raja-arvon!</string>
     <string name="alert_settings_title">Ilmoitusasetukset</string>
     <string name="alert_level_medium">Keskitaso (%.0f)</string>
     <string name="alert_level_high">Korkea (%.0f)</string>
